@@ -74,10 +74,12 @@
     const imageUrl = escapeAttr(resolveImageUrl(project.image_url, assetPrefix));
     const githubUrl = escapeAttr(project.github_url || "#");
     const liveUrl = escapeAttr(project.live_url || "#");
+    const hasLivePreview = Boolean(project.live_url) && !project.image_url;
 
     return `
       <article class="project-card">
         <div class="project-img">
+          ${hasLivePreview ? `<iframe class="project-preview-frame" src="${liveUrl}" title="${title} website preview" loading="lazy" tabindex="-1"></iframe>` : ""}
           <img src="${imageUrl}" alt="${title}" onerror="this.parentElement.textContent='📷 Project screenshot'">
         </div>
         <div class="project-body">
