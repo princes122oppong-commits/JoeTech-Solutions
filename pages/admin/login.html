@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login — JoeTech Solutions</title>
+  <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../css/style.css?v=20261003-admin-mobile">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="admin-body">
+  <main class="admin-shell">
+    <section class="auth-layout">
+      <aside class="brand-panel">
+        <div class="brand-row">
+          <img class="brand-row-logo" src="../../assets/images/joetech-logo.png" alt="JoeTech Solutions">
+        </div>
+        <p class="eyebrow">Portfolio Admin</p>
+        <h1>Welcome back.</h1>
+        <p class="brand-copy">Manage your projects, services, and client messages from one secure dashboard.</p>
+        <ul class="feature-list">
+          <li><i class="fa-solid fa-check"></i> Update portfolio content</li>
+          <li><i class="fa-solid fa-check"></i> Monitor inbound inquiries</li>
+          <li><i class="fa-solid fa-check"></i> Keep your portfolio current</li>
+        </ul>
+      </aside>
+
+      <section class="admin-card auth-card">
+        <div class="card-header">
+          <p class="eyebrow">Secure sign in</p>
+          <h2>Sign in</h2>
+        </div>
+
+        <form id="adminLoginForm" class="admin-form">
+          <div class="form-group">
+            <label for="adminEmail">Email</label>
+            <input type="email" id="adminEmail" name="email" placeholder="you@example.com" required autocomplete="username">
+          </div>
+          <div class="form-group">
+            <label for="adminPassword">Password</label>
+            <div class="password-field">
+              <input type="password" id="adminPassword" name="password" placeholder="Enter password" required autocomplete="current-password">
+              <button type="button" id="toggleAdminPassword" class="password-toggle" aria-label="Show password" aria-controls="adminPassword" aria-pressed="false" title="Show password">
+                <i class="fa-solid fa-eye" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary admin-submit-btn">Login</button>
+          <p id="adminStatus" class="form-status"></p>
+        </form>
+
+        <p class="demo-note">Use your Supabase Auth user. See README for setup.</p>
+      </section>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2?v=2"></script>
+  <script src="../../js/defaults.js?v=20261017"></script>
+  <script src="../../js/supabase.js?v=20261017"></script>
+  <script src="../../js/admin.js?v=20261017"></script>
+</body>
+</html>

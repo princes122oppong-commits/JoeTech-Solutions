@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — JoeTech Solutions</title>
+  <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../css/style.css?v=20261003-admin-mobile">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="admin-body admin-app">
+  <div class="admin-layout">
+    <button type="button" id="adminSidebarBackdrop" class="admin-sidebar-backdrop" hidden aria-label="Close navigation"></button>
+    <aside id="adminSidebar" class="admin-sidebar" aria-label="Admin navigation">
+      <div class="admin-sidebar-header">
+        <div class="admin-sidebar-brand">
+          <a href="../../index.html" class="logo" aria-label="JoeTech Solutions home">
+            <img src="../../assets/images/joetech-logo.png" alt="JoeTech Solutions">
+          </a>
+          <span class="admin-badge">Admin</span>
+        </div>
+        <button type="button" class="admin-drawer-close" aria-label="Close navigation">
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+      </div>
+      <nav id="adminSectionNav" class="admin-sidebar-nav" aria-label="Admin sections">
+        <a href="dashboard.html" aria-current="page" title="Overview" data-nav-tooltip="Overview"><i class="fa-solid fa-gauge-high" aria-hidden="true"></i><span class="admin-nav-label">Overview</span></a>
+        <a href="projects.html" title="Projects" data-nav-tooltip="Projects"><i class="fa-solid fa-folder-open" aria-hidden="true"></i><span class="admin-nav-label">Projects</span></a>
+        <a href="skills.html" title="Skills" data-nav-tooltip="Skills"><i class="fa-solid fa-code" aria-hidden="true"></i><span class="admin-nav-label">Skills</span></a>
+        <a href="services.html" title="Services" data-nav-tooltip="Services"><i class="fa-solid fa-briefcase" aria-hidden="true"></i><span class="admin-nav-label">Services</span></a>
+        <a href="testimonials.html" title="Testimonials" data-nav-tooltip="Testimonials"><i class="fa-solid fa-quote-left" aria-hidden="true"></i><span class="admin-nav-label">Testimonials</span></a>
+        <a href="messages.html" title="Messages" data-nav-tooltip="Messages"><i class="fa-solid fa-envelope" aria-hidden="true"></i><span class="admin-nav-label">Messages</span></a>
+      </nav>
+      <div class="admin-sidebar-actions">
+        <a href="../../index.html" class="admin-site-link" target="_blank" rel="noopener noreferrer" title="View site">
+          <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+          <span>View site</span>
+        </a>
+        <button type="button" class="btn-admin-logout js-admin-logout" title="Logout">
+          <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
+          <span>Logout</span>
+        </button>
+      </div>
+    </aside>
+    <div class="admin-content">
+      <header class="admin-topbar">
+        <div class="container admin-bar">
+          <button type="button" class="admin-menu-toggle" aria-expanded="false" aria-controls="adminSidebar" aria-label="Open admin menu">
+            <i class="fa-solid fa-bars" aria-hidden="true"></i>
+          </button>
+          <div class="admin-mobile-title-wrap">
+            <span class="admin-mobile-kicker">Admin</span>
+            <p class="admin-mobile-title">Overview</p>
+          </div>
+          <div class="admin-bar-actions">
+            <a href="../../index.html" class="admin-site-link admin-site-link-mobile" target="_blank" rel="noopener noreferrer" aria-label="View site">
+              <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+            </a>
+            <button type="button" class="btn-admin-logout btn-admin-logout-mobile js-admin-logout" aria-label="Logout">
+              <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
+              <span>Logout</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main class="container admin-dashboard">
+    <section class="admin-panel">
+      <div class="panel-header">
+        <h2>Overview</h2>
+      </div>
+      <p class="muted-text">Update portfolio content from each section. Changes sync to Supabase when you are signed in.</p>
+      <div id="adminOverviewGrid" class="admin-overview-grid" aria-live="polite"></div>
+    </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2?v=2"></script>
+  <script src="../../js/defaults.js?v=20261017"></script>
+  <script src="../../js/supabase.js?v=20261017"></script>
+  <script src="../../js/admin.js?v=20261018"></script>
+</body>
+</html>
