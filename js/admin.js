@@ -410,6 +410,7 @@
           document.getElementById("projectTitle").value = project.title;
           document.getElementById("projectDescription").value = project.description;
           document.getElementById("projectTags").value = (project.tags || []).join(", ");
+          document.getElementById("projectImage").value = project.image_url || "";
           document.getElementById("projectGithub").value = project.github_url || "";
           document.getElementById("projectLive").value = project.live_url || "";
           document.getElementById("cancelProjectEdit").classList.remove("hidden");
@@ -657,9 +658,9 @@
           title: document.getElementById("projectTitle").value.trim(),
           description: document.getElementById("projectDescription").value.trim(),
           tags: normalizeTags(document.getElementById("projectTags").value),
+          image_url: document.getElementById("projectImage").value.trim(),
           github_url: document.getElementById("projectGithub").value.trim(),
-          live_url: document.getElementById("projectLive").value.trim(),
-          image_url: "../assets/images/oppong-joseph-hero.png"
+          live_url: document.getElementById("projectLive").value.trim()
         };
 
         if (window.PortfolioSupabase && typeof window.PortfolioSupabase.isConfigured === "function" && window.PortfolioSupabase.isConfigured()) {
