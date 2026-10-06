@@ -73,7 +73,21 @@
           <div class="form-group"><label for="projectTags">Tags</label><input type="text" id="projectTags" name="tags" placeholder="HTML, CSS, JavaScript"></div>
         </div>
         <div class="form-group"><label for="projectDescription">Description</label><textarea id="projectDescription" name="description" rows="4" placeholder="Describe the project" required></textarea></div>
-        <div class="form-group"><label for="projectImage">Image URL</label><input type="text" id="projectImage" name="image_url" placeholder="Direct image URL, or leave blank to preview the live site"></div>
+        <div class="form-group">
+          <label for="projectImageFile">Project image</label>
+          <input type="file" id="projectImageFile" name="projectImageFile" accept="image/png,image/jpeg,image/webp,image/gif" aria-describedby="projectImageHelp">
+          <small id="projectImageHelp" class="form-help">Upload a JPG, PNG, WebP, or GIF image. Maximum size: 5 MB.</small>
+        </div>
+        <div class="project-image-editor">
+          <div id="projectImagePreview" class="project-image-preview" aria-live="polite">
+            <span>No image selected</span>
+          </div>
+          <div class="form-group project-image-url">
+            <label for="projectImage">Or enter an image URL</label>
+            <input type="text" id="projectImage" name="image_url" placeholder="https://example.com/project-image.jpg">
+          </div>
+        </div>
+        <div id="projectImageStatus" class="form-status" role="status"></div>
         <div class="form-row two-col">
           <div class="form-group"><label for="projectGithub">GitHub URL</label><input type="url" id="projectGithub" name="github_url" placeholder="https://github.com/owner/repo"></div>
           <div class="form-group"><label for="projectLive">Live URL</label><input type="url" id="projectLive" name="live_url" placeholder="https://example.com"></div>
@@ -87,7 +101,7 @@
   </div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2?v=2"></script>
   <script src="../../js/defaults.js?v=20261017"></script>
-  <script src="../../js/supabase.js?v=20261017"></script>
-  <script src="../../js/admin.js?v=20261019"></script>
+  <script src="../../js/supabase.js?v=20261006-auth-fix"></script>
+  <script src="../../js/admin.js?v=20261006-auth-fix"></script>
 </body>
 </html>

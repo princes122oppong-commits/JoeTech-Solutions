@@ -1,32 +1,5 @@
 -- Optional starter data for local demo/testing
-
-insert into public.projects (title, description, image_url, github_url, live_url, tags)
-values
-  (
-    'Personal Portfolio',
-    'A modern, fully responsive portfolio website showcasing my skills, projects and services.',
-    '../assets/images/profile.png',
-    '#',
-    '#',
-    array['HTML', 'CSS', 'JavaScript']
-  ),
-  (
-    'Restaurant Website',
-    'An elegant restaurant site with menu, reservation form and online ordering layout.',
-    '../assets/images/profile.png',
-    '#',
-    '#',
-    array['HTML', 'CSS', 'JS', 'PHP']
-  ),
-  (
-    'Weather App',
-    'Real-time weather dashboard using a public API — search any city and get live conditions.',
-    '../assets/images/profile.png',
-    '#',
-    '#',
-    array['JavaScript', 'API', 'CSS']
-  )
-on conflict do nothing;
+-- Keep project records empty until verified work is added through the admin dashboard.
 
 insert into public.skills (name, level)
 values

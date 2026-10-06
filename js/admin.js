@@ -68,11 +68,21 @@
       return null;
     }
 
-    return window.supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.key);
+    return window.PortfolioSupabase.getClient();
+  }
+
+  async function getSupabaseSession() {
+    const client = getSupabaseAuthClient();
+    if (!client) {
+      return null;
+    }
+
+    const { data, error } = await client.auth.getSession();
+    return error ? null : data.session;
   }
 
   async function signInWithSupabase(email, password) {
-    const client = getSupabaseAuthClient();
+    const client = window.PortfolioSupabase?.getClient?.();
 
     if (!client) {
       throw new Error("Supabase is not configured");
@@ -101,20 +111,11 @@
     }
   }
 
-  function isAdminSessionActive() {
-    const session = localStorage.getItem(storageKeys.session);
-    return Boolean(session);
-  }
-
-  function setAdminSession(email) {
-    localStorage.setItem(storageKeys.session, JSON.stringify({ email, loggedInAt: new Date().toISOString() }));
-  }
-
   function clearAdminSession() {
     localStorage.removeItem(storageKeys.session);
   }
 
-  function handleLoginPage() {
+  async function handleLoginPage() {
     const loginForm = document.getElementById("adminLoginForm");
     const status = document.getElementById("adminStatus");
     const passwordInput = document.getElementById("adminPassword");
@@ -146,10 +147,11 @@
       );
     }
 
-    if (isAdminSessionActive()) {
+    if (await getSupabaseSession()) {
       window.location.href = "dashboard.html";
       return;
     }
+    clearAdminSession();
 
     loginForm.addEventListener("submit", async (event) => {
       event.preventDefault();
@@ -170,7 +172,6 @@
       try {
         showStatus(status, "Signing in...", false);
         await signInWithSupabase(email, password);
-        setAdminSession(email);
         window.location.href = "dashboard.html";
       } catch (error) {
         console.error("Login failed:", error);
@@ -179,16 +180,21 @@
     });
   }
 
-  function ensureDashboardAccess() {
+  async function ensureDashboardAccess() {
     const path = window.location.pathname.toLowerCase();
     const isAdminPage = path.includes("/admin/") && !path.endsWith("login.html");
 
-    if (isAdminPage && !isAdminSessionActive()) {
-      window.location.href = "login.html";
-      return false;
+    if (!isAdminPage) {
+      return true;
     }
 
-    return true;
+    if (await getSupabaseSession()) {
+      return true;
+    }
+
+    clearAdminSession();
+    window.location.href = "login.html";
+    return false;
   }
 
   async function resolveStorageList(storageKey, fallback, getterName) {
@@ -383,6 +389,14 @@
     return window.confirm(`Delete ${type}${itemName}? This cannot be undone.`);
   }
 
+  function renderImagePreview(imageUrl) {
+    const imagePreview = document.getElementById("projectImagePreview");
+    if (!imagePreview) return;
+    imagePreview.innerHTML = imageUrl
+      ? `<img src="${escapeHtml(imageUrl)}" alt="Selected project preview">`
+      : "<span>No image selected</span>";
+  }
+
   function bindProjectActions() {
     document.querySelectorAll("[data-project-action]").forEach((button) => {
       const action = button.getAttribute("data-project-action");
@@ -413,6 +427,9 @@
           document.getElementById("projectImage").value = project.image_url || "";
           document.getElementById("projectGithub").value = project.github_url || "";
           document.getElementById("projectLive").value = project.live_url || "";
+          document.getElementById("projectImageFile").value = "";
+          document.getElementById("projectImageStatus").textContent = "";
+          renderImagePreview(project.image_url || "");
           document.getElementById("cancelProjectEdit").classList.remove("hidden");
         }
       });
@@ -650,6 +667,51 @@
   function bindDashboardForms() {
     const projectForm = document.getElementById("projectForm");
     if (projectForm) {
+      const imageInput = document.getElementById("projectImageFile");
+      const imageUrlInput = document.getElementById("projectImage");
+      const imageStatus = document.getElementById("projectImageStatus");
+      let selectedImage = null;
+
+      function setImageStatus(message, isError) {
+        showStatus(imageStatus, message, isError);
+      }
+
+      imageInput?.addEventListener("change", async () => {
+        const file = imageInput.files?.[0] || null;
+        selectedImage = null;
+
+        if (!file) {
+          renderImagePreview(imageUrlInput.value.trim());
+          setImageStatus("", false);
+          return;
+        }
+
+        if (!file.type.startsWith("image/")) {
+          imageInput.value = "";
+          setImageStatus("Please choose a JPG, PNG, WebP, or GIF image.", true);
+          return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+          imageInput.value = "";
+          setImageStatus("Project images must be smaller than 5 MB.", true);
+          return;
+        }
+
+        selectedImage = file;
+        const reader = new FileReader();
+        reader.addEventListener("load", () => renderImagePreview(reader.result));
+        reader.readAsDataURL(file);
+        setImageStatus(`${file.name} is ready to upload.`, false);
+      });
+
+      imageUrlInput?.addEventListener("input", () => {
+        selectedImage = null;
+        imageInput.value = "";
+        renderImagePreview(imageUrlInput.value.trim());
+        setImageStatus("", false);
+      });
+
       projectForm.addEventListener("submit", async (event) => {
         event.preventDefault();
         const id = Number(document.getElementById("projectId").value || Date.now());
@@ -658,24 +720,43 @@
           title: document.getElementById("projectTitle").value.trim(),
           description: document.getElementById("projectDescription").value.trim(),
           tags: normalizeTags(document.getElementById("projectTags").value),
-          image_url: document.getElementById("projectImage").value.trim(),
+          image_url: imageUrlInput.value.trim(),
           github_url: document.getElementById("projectGithub").value.trim(),
           live_url: document.getElementById("projectLive").value.trim()
         };
 
-        if (window.PortfolioSupabase && typeof window.PortfolioSupabase.isConfigured === "function" && window.PortfolioSupabase.isConfigured()) {
-          await window.PortfolioSupabase.upsertProject(project);
-        } else {
-          const projects = getStorageValue(storageKeys.projects, defaultProjects);
-          const isUpdate = projects.some((item) => item.id === id);
-          const updated = isUpdate ? projects.map((item) => (item.id === id ? project : item)) : [project, ...projects];
-          setStorageValue(storageKeys.projects, updated);
-        }
+        try {
+          if (selectedImage) {
+            if (!window.PortfolioSupabase?.uploadProjectImage || !window.PortfolioSupabase.isConfigured()) {
+              throw new Error("Image uploads require Supabase configuration. Enter an image URL instead.");
+            }
 
-        projectForm.reset();
-        document.getElementById("projectId").value = "";
-        document.getElementById("cancelProjectEdit").classList.add("hidden");
-        await renderProjectList();
+            setImageStatus("Uploading image...", false);
+            const uploadedImage = await window.PortfolioSupabase.uploadProjectImage(selectedImage, id);
+            project.image_url = uploadedImage.publicUrl;
+          }
+
+          if (window.PortfolioSupabase && typeof window.PortfolioSupabase.isConfigured === "function" && window.PortfolioSupabase.isConfigured()) {
+            await window.PortfolioSupabase.upsertProject(project);
+          } else {
+            const projects = getStorageValue(storageKeys.projects, defaultProjects);
+            const isUpdate = projects.some((item) => item.id === id);
+            const updated = isUpdate ? projects.map((item) => (item.id === id ? project : item)) : [project, ...projects];
+            setStorageValue(storageKeys.projects, updated);
+          }
+
+          projectForm.reset();
+          selectedImage = null;
+          imageInput.value = "";
+          renderImagePreview("");
+          document.getElementById("projectId").value = "";
+          document.getElementById("cancelProjectEdit").classList.add("hidden");
+          setImageStatus("Project saved.", false);
+          await renderProjectList();
+        } catch (error) {
+          console.error("Project save failed:", error);
+          setImageStatus(error.message || "Unable to save the project.", true);
+        }
       });
     }
 
@@ -813,7 +894,7 @@
   }
 
   async function initializeDashboard() {
-    if (!ensureDashboardAccess()) return;
+    if (!await ensureDashboardAccess()) return;
     bindAdminNavigation();
     await repairKnownServiceTypos();
 

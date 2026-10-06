@@ -3,30 +3,21 @@
     projects: [
       {
         id: 1,
-        title: "JoeTech Solutions Portfolio",
-        description: "This site — responsive portfolio with Supabase-backed content and an admin dashboard.",
-        image_url: "assets/images/oppong-joseph-hero.png",
+        title: "AT&T Home Decor",
+        description: "A responsive home-decor storefront for bedspreads, blankets, and related products, built with a clear shopping experience and mobile-first layout.",
+        image_url: "assets/images/3d2a7e1c-f469-4242-a3dc-6f1e088e282c.jpg",
         github_url: "",
-        live_url: "",
-        tags: ["HTML", "CSS", "JavaScript", "Supabase"]
+        live_url: "https://classicdreamspread.com/",
+        tags: ["HTML", "CSS", "JavaScript", "E-commerce"]
       },
       {
         id: 2,
-        title: "Restaurant Website",
-        description: "Menu, reservations, and mobile-friendly layout for a local restaurant brand.",
-        image_url: "assets/images/oppong-joseph-hero.png",
+        title: "CityCare Hospital Booking App",
+        description: "A digital hospital queue-management application that helps patients book appointments and keep the registration flow organised.",
+        image_url: "assets/images/ChatGPT Image Oct 2, 2026, 02_30_05 AM.png",
         github_url: "",
-        live_url: "",
-        tags: ["HTML", "CSS", "JavaScript"]
-      },
-      {
-        id: 3,
-        title: "Weather Dashboard",
-        description: "City search and live conditions using a public weather API.",
-        image_url: "assets/images/oppong-joseph-hero.png",
-        github_url: "",
-        live_url: "",
-        tags: ["JavaScript", "API", "CSS"]
+        live_url: "https://citycare-smartqueue.vercel.app/",
+        tags: ["HTML", "CSS", "JavaScript", "Hospital Systems"]
       }
     ],
     skills: [

@@ -17,24 +17,26 @@
     return window.PortfolioSupabase || null;
   }
 
-  function resolveImageUrl(rawUrl, assetPrefix) {
+  function resolveImageUrl(rawUrl, assetPrefix, projectTitle) {
+    const verifiedProjectImages = {
+      "at&t home decor": "/assets/images/3d2a7e1c-f469-4242-a3dc-6f1e088e282c.jpg",
+      "citycare hospital booking app": "/assets/images/ChatGPT Image Oct 2, 2026, 02_30_05 AM.png"
+    };
+
+    const normalizedTitle = String(projectTitle || "").trim().toLowerCase();
+    if (!rawUrl && verifiedProjectImages[normalizedTitle]) {
+      return verifiedProjectImages[normalizedTitle];
+    }
+
     if (!rawUrl) {
-      return `${assetPrefix}assets/images/project-placeholder.png`;
+      return "/assets/images/project-placeholder.png";
     }
 
     if (/^https?:\/\//i.test(rawUrl) || rawUrl.startsWith("/")) {
       return rawUrl;
     }
 
-    if (rawUrl.startsWith("../") && !assetPrefix) {
-      return rawUrl.replace(/^\.\.\//, "");
-    }
-
-    if (!rawUrl.startsWith("../") && assetPrefix && !rawUrl.startsWith(assetPrefix)) {
-      return `${assetPrefix}${rawUrl.replace(/^\.\//, "")}`;
-    }
-
-    return rawUrl;
+    return `/${rawUrl.replace(/^\.\//, "").replace(/^\.\.\//, "")}`;
   }
 
   function getServiceIcon(title) {
@@ -71,24 +73,33 @@
 
     const title = escapeHtml(project.title || "Project");
     const description = escapeHtml(project.description || "Project description coming soon.");
-    const imageUrl = escapeAttr(resolveImageUrl(project.image_url, assetPrefix));
-    const githubUrl = escapeAttr(project.github_url || "#");
-    const liveUrl = escapeAttr(project.live_url || "#");
-    const hasLivePreview = Boolean(project.live_url) && !project.image_url;
+    const imageUrl = escapeAttr(resolveImageUrl(project.image_url, assetPrefix, project.title));
+    const githubUrl = escapeAttr(project.github_url || "");
+    const liveUrl = escapeAttr(project.live_url || "");
+    const hasLiveUrl = Boolean(liveUrl);
+    const hasGithubUrl = Boolean(githubUrl);
+    const status = hasLiveUrl ? "Live project" : "Case study coming soon";
+
+    const liveLink = hasLiveUrl
+      ? `<a href="${liveUrl}" class="btn btn-small btn-outline" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt" aria-hidden="true"></i> Live project</a>`
+      : "";
+    const githubLink = hasGithubUrl
+      ? `<a href="${githubUrl}" class="btn btn-small" target="_blank" rel="noopener noreferrer"><i class="fab fa-github" aria-hidden="true"></i> Source code</a>`
+      : "";
 
     return `
       <article class="project-card">
         <div class="project-img">
-          ${hasLivePreview ? `<iframe class="project-preview-frame" src="${liveUrl}" title="${title} website preview" loading="lazy" tabindex="-1"></iframe>` : ""}
-          <img src="${imageUrl}" alt="${title}" onerror="this.parentElement.textContent='📷 Project screenshot'">
+          <img src="${imageUrl}" alt="${title} project preview" loading="lazy" onerror="this.parentElement.classList.add('project-image-error'); this.remove();">
+          <span class="project-status"><i class="fas fa-circle" aria-hidden="true"></i> ${status}</span>
         </div>
         <div class="project-body">
           <h3>${title}</h3>
           <p>${description}</p>
           <div class="tags">${tags}</div>
           <div class="project-links">
-            <a href="${githubUrl}" class="btn btn-small" target="_blank" rel="noopener noreferrer"><i class="fab fa-github" aria-hidden="true"></i> Code</a>
-            <a href="${liveUrl}" class="btn btn-small btn-outline" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt" aria-hidden="true"></i> Live</a>
+            ${githubLink}
+            ${liveLink}
           </div>
         </div>
       </article>

@@ -1,13 +1,14 @@
 (function () {
   const fallbackConfig = {
-    url: "https://oupjuvwtapvdmudkajhq.supabase.co",
-    key: "sb_publishable_PrD-U7hwoxGPkFqLA-6bjA_M5VkVZqR"
+    url: "https://ukmtiaatzegydzmhprwa.supabase.co",
+    key: "sb_publishable_xDXPU0kfUX5lZsqB313qlQ_iie6Vtpq"
   };
 
   window.SUPABASE_CONFIG = window.SUPABASE_CONFIG || fallbackConfig;
 
   const portfolioDefaults = window.PortfolioDefaults || {};
   const sampleProjects = portfolioDefaults.projects || [];
+  let sharedClient = null;
 
   function isConfigured() {
     const { url, key } = window.SUPABASE_CONFIG || {};
@@ -24,7 +25,15 @@
       return null;
     }
 
-    return window.supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.key);
+    if (!sharedClient) {
+      sharedClient = window.supabase.createClient(
+        window.SUPABASE_CONFIG.url,
+        window.SUPABASE_CONFIG.key,
+        { persistSession: true, autoRefreshToken: true }
+      );
+    }
+
+    return sharedClient;
   }
 
   const defaultSkills = portfolioDefaults.skills || [];
@@ -280,6 +289,42 @@
     return { success: true, simulated: false, data: data && data[0] ? data[0] : payload };
   }
 
+  async function uploadProjectImage(file, projectId) {
+    const client = getClient();
+    if (!client) {
+      throw new Error("Supabase is not configured");
+    }
+
+    const { data: sessionData, error: sessionError } = await client.auth.getSession();
+    if (sessionError || !sessionData.session) {
+      throw new Error("No active Supabase session was found for this site. Sign in to the admin page on this same site origin, then retry the upload.");
+    }
+
+    if (!file || !file.type.startsWith("image/")) {
+      throw new Error("Please choose an image file.");
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      throw new Error("Project images must be smaller than 5 MB.");
+    }
+
+    const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
+    const safeExtension = ["jpg", "jpeg", "png", "webp", "gif"].includes(extension) ? extension : "jpg";
+    const filePath = `${projectId}-${Date.now()}.${safeExtension}`;
+    const { error } = await client.storage.from("project-images").upload(filePath, file, {
+      cacheControl: "3600",
+      upsert: true,
+      contentType: file.type
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    const { data } = client.storage.from("project-images").getPublicUrl(filePath);
+    return { publicUrl: data.publicUrl, filePath };
+  }
+
   async function deleteRecord(table, id) {
     const client = getClient();
 
@@ -339,6 +384,7 @@
   window.PortfolioSupabase = {
     sampleProjects,
     isConfigured,
+    getClient,
     getProjects,
     getSkills,
     getServices,
@@ -347,6 +393,7 @@
     getMessages,
     upsertRecord,
     deleteRecord,
+    uploadProjectImage,
     submitContactMessage,
     upsertProject: (project) => upsertRecord("projects", project),
     deleteProject: (id) => deleteRecord("projects", id),
