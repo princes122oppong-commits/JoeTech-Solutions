@@ -141,60 +141,71 @@ alter table public.services enable row level security;
 alter table public.testimonials enable row level security;
 alter table public.contact_messages enable row level security;
 
+drop policy if exists "Public can read projects" on public.projects;
 create policy "Public can read projects"
 on public.projects
 for select
 using (true);
 
+drop policy if exists "Authenticated users can manage projects" on public.projects;
 create policy "Authenticated users can manage projects"
 on public.projects
 for all
 using (auth.role() = 'authenticated')
 with check (auth.role() = 'authenticated');
 
+drop policy if exists "Public can read skills" on public.skills;
 create policy "Public can read skills"
 on public.skills
 for select
 using (true);
 
+drop policy if exists "Authenticated users can manage skills" on public.skills;
 create policy "Authenticated users can manage skills"
 on public.skills
 for all
 using (auth.role() = 'authenticated')
 with check (auth.role() = 'authenticated');
 
+drop policy if exists "Public can read services" on public.services;
 create policy "Public can read services"
 on public.services
 for select
 using (true);
 
+drop policy if exists "Authenticated users can manage services" on public.services;
 create policy "Authenticated users can manage services"
 on public.services
 for all
 using (auth.role() = 'authenticated')
 with check (auth.role() = 'authenticated');
 
+drop policy if exists "Public can read testimonials" on public.testimonials;
 create policy "Public can read testimonials"
 on public.testimonials
 for select
 using (true);
 
+drop policy if exists "Authenticated users can manage testimonials" on public.testimonials;
 create policy "Authenticated users can manage testimonials"
 on public.testimonials
 for all
 using (auth.role() = 'authenticated')
 with check (auth.role() = 'authenticated');
 
+drop policy if exists "Anyone can create a contact message" on public.contact_messages;
 create policy "Anyone can create a contact message"
 on public.contact_messages
 for insert
 with check (true);
 
+drop policy if exists "Authenticated users can read contact messages" on public.contact_messages;
 create policy "Authenticated users can read contact messages"
 on public.contact_messages
 for select
 using (auth.role() = 'authenticated');
 
+drop policy if exists "Authenticated users can delete contact messages" on public.contact_messages;
 create policy "Authenticated users can delete contact messages"
 on public.contact_messages
 for delete
