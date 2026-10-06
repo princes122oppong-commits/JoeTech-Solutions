@@ -219,12 +219,18 @@ create index if not exists idx_contact_messages_created_at on public.contact_mes
 -- 3) Seed starter content. Project records are intentionally empty until verified work is added.
 
 insert into public.skills (name, level)
-values
+select seed.name, seed.level
+from (values
   ('HTML & CSS', 90),
   ('JavaScript', 85),
   ('React', 80),
   ('Node.js', 75)
-on conflict do nothing;
+) as seed(name, level)
+where not exists (
+  select 1
+  from public.skills existing
+  where lower(btrim(existing.name)) = lower(btrim(seed.name))
+);
 
 insert into public.services (title, description)
 values

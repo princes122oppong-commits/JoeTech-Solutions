@@ -78,6 +78,19 @@
   }
 
   async function getSkills() {
+    function uniqueSkills(skills) {
+      const seen = new Set();
+      return (skills || []).filter((skill) => {
+        const name = String(skill.name || "").trim().toLowerCase();
+        if (!name || seen.has(name)) {
+          return false;
+        }
+
+        seen.add(name);
+        return true;
+      });
+    }
+
     const client = getClient();
 
     if (client) {
@@ -89,16 +102,19 @@
       if (error) {
         console.warn("Supabase skills query failed:", error.message);
       } else if (data && data.length) {
-        return data;
+        const skills = uniqueSkills(data);
+        if (skills.length) {
+          return skills;
+        }
       }
     }
 
     const localSkills = readLocalStorageList("portfolio_skills");
     if (localSkills) {
-      return localSkills;
+      return uniqueSkills(localSkills);
     }
 
-    return defaultSkills;
+    return uniqueSkills(defaultSkills);
   }
 
   const defaultServices = portfolioDefaults.services || [];
